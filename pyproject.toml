@@ -15,3 +15,7 @@ requires-python = ">=3.8"
 [build-system]
 requires = ["setuptools>=59.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src/", "src/pub_oapi_tools_common"]
+include = ["pub_oapi_tools_common"]
