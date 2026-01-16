@@ -51,7 +51,7 @@ def get_parameters(input_payload, verbose=False):
         params = validate_parameters_response(response, verbose)
 
     except Exception as e:
-        log("ERROR", __name__, f"Error invoking Lambda function: {e}")
+        raise f"Error invoking Lambda function: {e}"
 
     return params
 
