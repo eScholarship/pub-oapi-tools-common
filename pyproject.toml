@@ -1,9 +1,9 @@
 [project]
-name = "pub-oapi-tools-common"
+name = "pub_oapi_tools_common"
 version = "0.1.0"
 description = "Utilities used by the pub oapi tools programs."
 authors = [
-    {name = "William Shakespear", email = "thebard@hotmail.com"},
+    {name = "William Shakespeare", email = "thebard@hotmail.com"},
 ]
 dependencies = [
     "boto3>=1.42.29",
