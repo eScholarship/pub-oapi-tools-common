@@ -6,11 +6,18 @@ import pymysql
 from misc import log
 
 
-def get_connection(creds, cursor_class="DictCursor", verbose=False):
+# To connect to a tools DB,
+# user supplies either a creds dict (see aws_lambda.py for format),
+# or an env (e.g., prod or qa) and a database.
+def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor", verbose=False):
     log("INFO", __name__,
-        f"Connecting to pub-oapi-tools RDS, database: {creds['database']}")
-    log("INFO", __name__,
-        f"This module uses the package pymysql: https://pymysql.readthedocs.io/en/latest/")
+        (f"Connecting to pub-oapi-tools RDS."
+         f"This module uses the package pymysql: https://pymysql.readthedocs.io/en/latest/"))
+
+    if not (creds or (env and database)):
+        log("ERROR", __name__,
+            ("Must provide either 'creds', or 'env' and 'database'. "
+             "Otherwise, we don't know what you want to connect to."))
 
     # We typically use DictCursor, but other classes are available.
     # See here for more info
@@ -25,9 +32,31 @@ def get_connection(creds, cursor_class="DictCursor", verbose=False):
     elif cursor_class == "SSDictCursor":
         cursor_class = pymysql.cursors.SSDictCursor
 
-    return pymysql.connect(
-        host=creds['server'],
-        user=creds['user'],
-        password=creds['password'],
-        database=creds['database'],
-        cursorclass=cursor_class)
+    # User has supplied creds from parameter store
+    if creds:
+        return pymysql.connect(
+            host=creds['server'],
+            user=creds['user'],
+            password=creds['password'],
+            database=creds['database'],
+            cursorclass=cursor_class)
+
+    # Using the env and database name,
+    else:
+        from aws_lambda import get_parameters
+        creds = {
+            'tools-rds': {
+                'folder': 'pub-oapi-tools/tools-rds',
+                'env': env,
+                'names': ['server', 'user', 'password']},
+            'database': {
+                'names': [database]
+            }}
+        creds = get_parameters(creds)
+
+        return pymysql.connect(
+            host=creds['tools-rds']['server'],
+            user=creds['tools-rds']['user'],
+            password=creds['tools-rds']['password'],
+            database=creds['database'][database],
+            cursorclass=cursor_class)

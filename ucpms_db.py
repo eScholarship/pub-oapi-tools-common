@@ -10,19 +10,42 @@ import pyodbc
 from misc import log
 
 
-def get_connection(creds, autocommit=True, verbose=False):
+def get_connection(creds=None, env=None, autocommit=True, verbose=False):
     log("INFO", __name__,
-        f"Connecting to the Elements reporting DB, database: {creds['database']}")
-    log("INFO", __name__,
-        f"This module uses the package pyodbc: https://pypi.org/project/pyodbc/")
+        (f"Connecting to the Elements reporting DB. "
+         f"This module uses the package pyodbc: https://pypi.org/project/pyodbc/"))
 
-    mssql_conn = pyodbc.connect(
-        driver=creds['driver'],
-        server=(creds['server'] + ',1433'),
-        database=creds['database'],
-        uid=creds['user'],
-        pwd=creds['password'],
-        trustservercertificate='yes')
+    if not (creds or env):
+        log("ERROR", __name__,
+            ("Must provide either 'creds', or 'env'. "
+             "Otherwise, we don't know what you want to connect to."))
+
+    # User has supplied creds from parameter store
+    if creds:
+        mssql_conn = pyodbc.connect(
+            driver=creds['driver'],
+            server=(creds['server'] + ',1433'),
+            database=creds['database'],
+            uid=creds['user'],
+            pwd=creds['password'],
+            trustservercertificate='yes')
+
+    # User supplied env and db name. Connect to lambda for creds
+    else:
+        from aws_lambda import get_parameters
+        creds = {
+            'elements_db': {
+                'folder': 'pub-oapi-tools/elements-reporting-db',
+                'env': env}}
+        creds = get_parameters(creds)['elements_db']
+
+        mssql_conn = pyodbc.connect(
+            driver=creds['driver'],
+            server=(creds['server'] + ',1433'),
+            database=creds['database'],
+            uid=creds['user'],
+            pwd=creds['password'],
+            trustservercertificate='yes')
 
     # Required when queries use TRANSACTION
     mssql_conn.autocommit = autocommit
