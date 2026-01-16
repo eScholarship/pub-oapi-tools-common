@@ -1,15 +1,22 @@
 """
-This program connects to the pub-oapi-tools RDS.
+Functions for working with the pub-oapi-tools DB
 """
 
 import pymysql
 from misc import log
 
 
-# To connect to a tools DB,
-# user supplies either a creds dict (see aws_lambda.py for format),
-# or an env (e.g., prod or qa) and a database.
 def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor", verbose=False):
+    """
+    Connects to the pub-oapi-tools RDS.
+
+    Usage:
+        get_connection(creds) -- see aws_lambda.py for expected dict input format
+        or get_connection(env, database)
+
+    Returns an open pymysql connection
+    """
+
     log("INFO", __name__,
         (f"Connecting to pub-oapi-tools RDS."
          f"This module uses the package pymysql: https://pymysql.readthedocs.io/en/latest/"))
@@ -50,6 +57,8 @@ def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor
                 'env': env,
                 'names': ['server', 'user', 'password']},
             'database': {
+                'folder': 'pub-oapi-tools/tools-rds',
+                'env': env,
                 'names': [database]
             }}
         creds = get_parameters(creds)

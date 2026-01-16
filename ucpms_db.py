@@ -1,5 +1,5 @@
 """
-This program connects to the UCPMS datbase.
+Functions for working with the UCPMS reporting DB.
 
 As of 2026-01-01, This is the Elements reporting database.
 Please note that additional work is required from Symplectic
@@ -11,6 +11,16 @@ from misc import log
 
 
 def get_connection(creds=None, env=None, autocommit=True, verbose=False):
+    """
+    Connects to the Elements reporting DB.
+
+    Usage:
+        get_connection(creds) -- see aws_lambda.py for expected dict input format
+        or get_connection(env, database)
+
+    Returns an open pyodbc connection
+    """
+
     log("INFO", __name__,
         (f"Connecting to the Elements reporting DB. "
          f"This module uses the package pyodbc: https://pypi.org/project/pyodbc/"))
