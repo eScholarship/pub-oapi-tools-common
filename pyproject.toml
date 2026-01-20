@@ -1,0 +1,17 @@
+[project]
+name = "pub_oapi_tools_common"
+version = "0.1.0"
+description = "Utilities used by the pub oapi tools programs."
+authors = [
+    {name = "Devin Smith", email = "devin.smith@ucop.edu"},
+]
+dependencies = [
+    "boto3>=1.42.29",
+    "pyodbc>=5.3.0",
+    "PyMySQL>=1.1.2"
+]
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["setuptools>=59.0"]
+build-backend = "setuptools.build_meta"

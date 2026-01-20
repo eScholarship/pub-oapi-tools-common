@@ -7,7 +7,7 @@ to allow this connection to occur (e.g. allow-listing IP CIDRs).
 """
 
 import pyodbc
-from misc import log
+from pub_oapi_tools_common.misc import log
 
 
 def get_connection(creds=None, env=None, autocommit=True, verbose=False):
@@ -19,6 +19,12 @@ def get_connection(creds=None, env=None, autocommit=True, verbose=False):
         or get_connection(env, database)
 
     Returns an open pyodbc connection
+
+    :param creds:
+    :param env:
+    :param autocommit:
+    :param verbose:
+    :return:
     """
 
     log("INFO", __name__,
@@ -42,7 +48,7 @@ def get_connection(creds=None, env=None, autocommit=True, verbose=False):
 
     # User supplied env and db name. Connect to lambda for creds
     else:
-        from aws_lambda import get_parameters
+        from pub_oapi_tools_common.aws_lambda import get_parameters
         creds = {
             'elements_db': {
                 'folder': 'pub-oapi-tools/elements-reporting-db',
