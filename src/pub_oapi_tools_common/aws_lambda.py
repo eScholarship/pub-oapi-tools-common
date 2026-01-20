@@ -1,37 +1,38 @@
-from misc import log
+from pub_oapi_tools_common.misc import log
 import boto3
 import json
 
 
-"""
-This program connects to a lambda function which connects to parameter store.
-It expects python dict input in the following format:
-
-{
-    "name_of_thing_1": {
-        "Folder": "path-to-thing-1",
-        "env": "qa"
-    },
-    "name_of_thing_2": {
-        "Folder": "path-to-thing-2",
-    },
-    "name_of_thing_3": {
-        "Folder": "path-to-thing-3",
-        "env": "prod"
-        "names": ['name_1', 'name_2']
-    },
-}
-
-The first retrieves all params in the path: path-to-thing-1/qa/*
-
-The second retrieves all params in the path: path-to-think-2/*
-
-The third retrieves only params listed in 'names' in: path-to-thing-3/prod
-(The third pattern can also be used without an 'env'.)
-"""
-
-
 def get_parameters(input_payload, verbose=False):
+    """
+    Connects to AWS lambda to retrieve the specified params.
+    It expects python dict input in the following formats:
+
+    {
+        "name_of_thing_1": {
+            "Folder": "path-to-thing-1",
+            "env": "qa"
+        },
+        "name_of_thing_2": {
+            "Folder": "path-to-thing-2",
+        },
+        "name_of_thing_3": {
+            "Folder": "path-to-thing-3",
+            "env": "prod"
+            "names": ['name_1', 'name_2']
+        },
+    }
+
+    - The first retrieves all params in the path: path-to-thing-1/qa/*
+    - The second retrieves all params in the path: path-to-think-2/*
+    - The third retrieves only params listed in 'names' in: path-to-thing-3/prod
+    (The third pattern can also be used without an 'env'.)
+
+    :param input_payload:
+    :param verbose:
+    :return:
+    """
+
     log("INFO", __name__, "Retrieving parameters from AWS.")
 
     # Session and client setup
@@ -56,8 +57,16 @@ def get_parameters(input_payload, verbose=False):
     return params
 
 
-# Ensures 200 responses and checks for common problems
 def validate_parameters_response(raw_response, verbose):
+    """
+    Ensures 200 responses and checks for common problems.
+    Called from get_parameters() above.
+
+    :param raw_response:
+    :param verbose:
+    :return:
+    """
+
     if verbose:
         log("DEBUG", __name__, f"raw response:\n{raw_response}")
 

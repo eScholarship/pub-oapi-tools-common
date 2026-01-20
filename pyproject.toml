@@ -3,7 +3,7 @@ name = "pub_oapi_tools_common"
 version = "0.1.0"
 description = "Utilities used by the pub oapi tools programs."
 authors = [
-    {name = "William Shakespeare", email = "thebard@hotmail.com"},
+    {name = "Devin Smith", email = "devin.smith@ucop.edu"},
 ]
 dependencies = [
     "boto3>=1.42.29",

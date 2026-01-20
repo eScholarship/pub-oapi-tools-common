@@ -3,7 +3,7 @@ Functions for working with the pub-oapi-tools DB
 """
 
 import pymysql
-from misc import log
+from pub_oapi_tools_common.misc import log
 
 
 def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor", verbose=False):
@@ -15,6 +15,13 @@ def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor
         or get_connection(env, database)
 
     Returns an open pymysql connection
+
+    :param creds:
+    :param env:
+    :param database:
+    :param cursor_class:
+    :param verbose:
+    :return:
     """
 
     log("INFO", __name__,
@@ -50,7 +57,7 @@ def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor
 
     # Using the env and database name,
     else:
-        from aws_lambda import get_parameters
+        from pub_oapi_tools_common.aws_lambda import get_parameters
         creds = {
             'tools-rds': {
                 'folder': 'pub-oapi-tools/tools-rds',
