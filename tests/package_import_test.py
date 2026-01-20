@@ -1,3 +1,7 @@
+"""
+Verifies the package is installed accessible.
+"""
+
 from sys import path
 print("Python system path:")
 print(path)

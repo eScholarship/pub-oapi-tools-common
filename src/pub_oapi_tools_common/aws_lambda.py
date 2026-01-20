@@ -3,10 +3,10 @@ import boto3
 import json
 
 
-def get_parameters(input_payload, verbose=False):
+def get_parameters(input_payload: dict, verbose: bool = False) -> dict:
     """
     Connects to AWS lambda to retrieve the specified params.
-    It expects python dict input in the following formats:
+    It expects python dict input in the following formats
 
     {
         "name_of_thing_1": {
@@ -28,9 +28,9 @@ def get_parameters(input_payload, verbose=False):
     - The third retrieves only params listed in 'names' in: path-to-thing-3/prod
     (The third pattern can also be used without an 'env'.)
 
-    :param input_payload:
-    :param verbose:
-    :return:
+    :param input_payload: See above for expected dict format.
+    :param verbose: Prints extra debug info.
+    :return: A dict formatted like {name_of_thing_1: [{name_A: val_A, name_B: val_B}], ...}
     """
 
     log("INFO", __name__, "Retrieving parameters from AWS.")

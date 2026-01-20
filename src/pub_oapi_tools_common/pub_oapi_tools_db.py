@@ -6,7 +6,11 @@ import pymysql
 from pub_oapi_tools_common.misc import log
 
 
-def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor", verbose=False):
+def get_connection(
+        creds: dict = None,
+        env: str = None,
+        database: str = None,
+        cursor_class: str = "DictCursor") -> pymysql.connections.Connection:
     """
     Connects to the pub-oapi-tools RDS.
 
@@ -14,14 +18,13 @@ def get_connection(creds=None, env=None, database=None, cursor_class="DictCursor
         get_connection(creds) -- see aws_lambda.py for expected dict input format
         or get_connection(env, database)
 
-    Returns an open pymysql connection
-
-    :param creds:
-    :param env:
-    :param database:
-    :param cursor_class:
-    :param verbose:
-    :return:
+    :param creds: A dict containing driver, server, database, user, and password key/values.
+    :param env: Presently, "prod" is the only env here.
+    :param database: Name of the DB to connect to.
+    :param cursor_class: (String) name of a PyMySQL cursor class:
+        Cursor, DictCursor (default), SSCursor, or SSDictCursor. See here
+        https://pymysql.readthedocs.io/en/latest/modules/cursors.html#
+    :return: An open PyMySQL connection.
     """
 
     log("INFO", __name__,

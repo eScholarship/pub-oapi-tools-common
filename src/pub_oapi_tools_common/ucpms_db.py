@@ -10,21 +10,19 @@ import pyodbc
 from pub_oapi_tools_common.misc import log
 
 
-def get_connection(creds=None, env=None, autocommit=True, verbose=False):
+def get_connection(
+        creds: dict = None,
+        env: str = None,
+        autocommit: bool = True) -> pyodbc.Connection:
     """
-    Connects to the Elements reporting DB.
+    Connects to the Elements reporting DB. Requires either a creds JSON
+    or an env variable (prod or qa). Uses the pyodbc package.
 
-    Usage:
-        get_connection(creds) -- see aws_lambda.py for expected dict input format
-        or get_connection(env, database)
-
-    Returns an open pyodbc connection
-
-    :param creds:
-    :param env:
-    :param autocommit:
-    :param verbose:
-    :return:
+    :param creds: A dict containing keys/values for:
+        driver, server, database, user, and password.
+    :param env: "prod" or "qa".
+    :param autocommit: "True" required for queries that use transactions.
+    :return: An open pyodbc connection
     """
 
     log("INFO", __name__,
