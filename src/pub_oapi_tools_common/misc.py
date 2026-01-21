@@ -16,10 +16,22 @@ def log(level: str,
     :param message: The log text.
     """
 
+    class Colors:
+        RED = '\033[91m'
+        GREEN = '\033[92m'
+        YELLOW = '\033[93m'
+        BLUE = '\033[94m'
+        CYAN = '\033[96m'
+        RESET = '\033[0m'  # Resets the color
+
     from datetime import datetime
 
     now = datetime.now().isoformat()
     if level == "ERROR" or level == "FATAL":
-        raise f"[{now}] [{level}] [{module}] {message}"
+        raise f"{Colors.CYAN}[{now}]{Colors.RESET} " \
+              f"{Colors.RED}[{level}]{Colors.RESET} " \
+              f"[{module}] {message}"
     else:
-        print(f"[{now}] [{level}] [{module}] {message}")
+        print(f"{Colors.CYAN}[{now}]{Colors.RESET} "
+              f"{Colors.GREEN}[{level}]{Colors.RESET} "
+              f"[{module}] {message}")

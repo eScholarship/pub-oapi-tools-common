@@ -45,12 +45,12 @@ def get_connection(creds: dict = None,
 
     # User supplied env and db name. Connect to lambda for creds
     else:
-        from pub_oapi_tools_common.aws_lambda import get_parameters
+        from pub_oapi_tools_common import aws_lambda
         creds = {
             'elements_db': {
                 'folder': 'pub-oapi-tools/elements-reporting-db',
                 'env': env}}
-        creds = get_parameters(creds)['elements_db']
+        creds = aws_lambda.get_parameters(creds)['elements_db']
 
         mssql_conn = pyodbc.connect(
             driver=creds['driver'],
