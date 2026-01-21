@@ -10,10 +10,9 @@ import pyodbc
 from pub_oapi_tools_common.misc import log
 
 
-def get_connection(
-        creds: dict = None,
-        env: str = None,
-        autocommit: bool = True) -> pyodbc.Connection:
+def get_connection(creds: dict = None,
+                   env: str = None,
+                   autocommit: bool = True) -> pyodbc.Connection:
     """
     Connects to the Elements reporting DB. Requires either a creds JSON
     or an env variable (prod or qa). Uses the pyodbc package.
@@ -65,3 +64,17 @@ def get_connection(
     mssql_conn.autocommit = autocommit
 
     return mssql_conn
+
+
+def get_dict_list(cursor: pyodbc.Cursor) -> list:
+    """
+    Converts PYODBC output to a list of dicts.
+    Run this following `cursor.execute()`.
+
+    :param cursor: A pyodbc cursor
+    :return: A list of dicts
+    """
+
+    columns = [column[0] for column in cursor.description]
+    rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    return rows

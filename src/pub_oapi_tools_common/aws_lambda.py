@@ -3,7 +3,8 @@ import boto3
 import json
 
 
-def get_parameters(input_payload: dict, verbose: bool = False) -> dict:
+def get_parameters(input_payload: dict,
+                   verbose: bool = True) -> dict:
     """
     Connects to AWS lambda to retrieve the specified params.
     It expects python dict input in the following formats
@@ -61,10 +62,6 @@ def validate_parameters_response(raw_response, verbose):
     """
     Ensures 200 responses and checks for common problems.
     Called from get_parameters() above.
-
-    :param raw_response:
-    :param verbose:
-    :return:
     """
 
     if verbose:

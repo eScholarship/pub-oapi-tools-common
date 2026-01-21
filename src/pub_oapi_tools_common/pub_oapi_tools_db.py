@@ -6,11 +6,11 @@ import pymysql
 from pub_oapi_tools_common.misc import log
 
 
-def get_connection(
-        creds: dict = None,
-        env: str = None,
-        database: str = None,
-        cursor_class: str = "DictCursor") -> pymysql.connections.Connection:
+def get_connection(creds: dict = None,
+                   env: str = None,
+                   database: str = None,
+                   cursor_class: str = "DictCursor"
+                   ) -> pymysql.connections.Connection:
     """
     Connects to the pub-oapi-tools RDS.
 

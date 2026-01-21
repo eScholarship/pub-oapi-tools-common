@@ -3,7 +3,9 @@ This module contains small helper functions.
 """
 
 
-def log(level: str, module: str, message: str):
+def log(level: str,
+        module: str,
+        message: str):
     """
     Prints messages standard machine-readable format:
     [timestamp] [level] [module] [message]
