@@ -3,6 +3,17 @@ This module contains small helper functions.
 """
 
 
+class Colors:
+    """ Codes for bash text colors """
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    RESET = '\033[0m'  # Resets the color
+
+
 def log(level: str,
         module: str,
         message: str):
@@ -16,22 +27,17 @@ def log(level: str,
     :param message: The log text.
     """
 
-    class Colors:
-        RED = '\033[91m'
-        GREEN = '\033[92m'
-        YELLOW = '\033[93m'
-        BLUE = '\033[94m'
-        CYAN = '\033[96m'
-        RESET = '\033[0m'  # Resets the color
-
+    from pub_oapi_tools_common.misc import Colors
     from datetime import datetime
 
     now = datetime.now().isoformat()
     if level == "ERROR" or level == "FATAL":
-        raise f"{Colors.CYAN}[{now}]{Colors.RESET} " \
-              f"{Colors.RED}[{level}]{Colors.RESET} " \
+        raise f"[{Colors.CYAN}{now}{Colors.RESET}] " \
+              f"[{Colors.RED}{level}{Colors.RESET}] " \
               f"[{module}] {message}"
     else:
-        print(f"{Colors.CYAN}[{now}]{Colors.RESET} "
-              f"{Colors.GREEN}[{level}]{Colors.RESET} "
-              f"[{module}] {message}")
+        level_color = Colors.GREEN if level == "INFO" else Colors.YELLOW
+        print(f"[{Colors.CYAN}{now}{Colors.RESET}] "
+              f"[{level_color}{level}{Colors.RESET}] "
+              f"[{Colors.MAGENTA}{module}{Colors.RESET}] "
+              f"{message}")
