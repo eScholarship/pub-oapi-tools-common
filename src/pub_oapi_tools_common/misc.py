@@ -19,8 +19,9 @@ def log(level: str,
         message: str):
     """
     Prints messages standard machine-readable format:
-    [timestamp] [level] [module] message
-    "ERROR" or "FATAL" levels will raise() instead of print().
+        [timestamp] [level] [module] message
+
+    "ERROR" or "FATAL" levels will exit(1) after printing.
 
     :param level: Use the following standard-issue levels for readability, INFO, DEBUG, TRACE, WARN, ERROR, FATAL.
     :param module: The name of the module printing the log. (Typically, use __name__ here.)
@@ -30,11 +31,13 @@ def log(level: str,
     from pub_oapi_tools_common.misc import Colors
     from datetime import datetime
 
-    now = datetime.now().isoformat()
+    now = datetime.now().isoformat()[:-3]
     if level == "ERROR" or level == "FATAL":
-        raise f"[{Colors.CYAN}{now}{Colors.RESET}] " \
-              f"[{Colors.RED}{level}{Colors.RESET}] " \
-              f"[{module}] {message}"
+        print(f"[{Colors.CYAN}{now}{Colors.RESET}] "
+              f"[{Colors.RED}{level}{Colors.RESET}] "
+              f"[{module}] {message}")
+        exit(1)
+
     else:
         level_color = Colors.GREEN if level == "INFO" else Colors.YELLOW
         print(f"[{Colors.CYAN}{now}{Colors.RESET}] "

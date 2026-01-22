@@ -33,9 +33,8 @@ def get_connection(creds: dict = None,
          f"https://pymysql.readthedocs.io/en/latest/"))
 
     if not (creds or (env and database)):
-        log("ERROR", __name__,
-            ("Must provide either 'creds', or 'env' and 'database'. "
-             "Otherwise, we don't know what you want to connect to."))
+        raise ValueError("Must provide either 'creds', or 'env' and 'database'. "
+                         "Otherwise, we don't know what you want to connect to.")
 
     # We typically use DictCursor, but other classes are available.
     # https://pymysql.readthedocs.io/en/latest/modules/cursors.html#
@@ -60,12 +59,12 @@ def get_connection(creds: dict = None,
     # Using the env and database name,
     else:
         from pub_oapi_tools_common.aws_lambda import get_parameters
+
         creds = {
             'eschol-db': {
                 'folder': 'pub-oapi-tools/eschol-db',
-                'env': env
-            }
-        }
+                'env': env}}
+
         creds = get_parameters(creds)
 
         return pymysql.connect(

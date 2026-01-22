@@ -70,6 +70,7 @@ def validate_parameters_response(raw_response, verbose):
     # Check metadata HTTP status code
     metadata = raw_response['ResponseMetadata']
     if metadata['HTTPStatusCode'] != 200:
+
         log("ERROR", __name__,
             f"HTTP response from Lambda returned non-200:\n{metadata}")
 
@@ -96,7 +97,7 @@ def validate_parameters_response(raw_response, verbose):
             log("DEBUG", __name__, f"{key} : {value}")
 
         if not value or value == []:
-            log("WARN", __name__,
+            log("ERROR", __name__,
                 (f'The parameters for {key} returned empty. '
                  'This will likely cause runtime issues. '
                  'Check your input folder/env against Parameter Store for typos.'))
