@@ -1,9 +1,9 @@
 """
-Functions for working with the pub-oapi-tools MySQL DB
+Functions for working with the eScholarship MySQL DB
 """
 
-from pub_oapi_tools_common.misc import log
 import pymysql
+from pub_oapi_tools_common.misc import log
 
 
 def get_connection(creds: dict = None,
@@ -12,7 +12,7 @@ def get_connection(creds: dict = None,
                    cursor_class: str = "DictCursor"
                    ) -> pymysql.connections.Connection:
     """
-    Connects to the pub-oapi-tools RDS.
+    Connects to the eScholarship MySQL database.
 
     Usage:
         get_connection(creds) -- see aws_lambda.py for expected dict input format
@@ -28,7 +28,7 @@ def get_connection(creds: dict = None,
     """
 
     log("INFO", __name__,
-        (f"Connecting to pub-oapi-tools RDS. "
+        (f"Connecting to eScholarship database. "
          f"This module uses the package pymysql: "
          f"https://pymysql.readthedocs.io/en/latest/"))
 
@@ -61,20 +61,16 @@ def get_connection(creds: dict = None,
     else:
         from pub_oapi_tools_common.aws_lambda import get_parameters
         creds = {
-            'tools-rds': {
-                'folder': 'pub-oapi-tools/tools-rds',
-                'env': env,
-                'names': ['server', 'user', 'password']},
-            'database': {
-                'folder': 'pub-oapi-tools/tools-rds',
-                'env': env,
-                'names': [database]}
+            'eschol-db': {
+                'folder': 'pub-oapi-tools/eschol-db',
+                'env': env
+            }
         }
         creds = get_parameters(creds)
 
         return pymysql.connect(
-            host=creds['tools-rds']['server'],
-            user=creds['tools-rds']['user'],
-            password=creds['tools-rds']['password'],
-            database=creds['database'][database],
+            host=creds['eschol-db']['server'],
+            user=creds['eschol-db']['user'],
+            password=creds['eschol-db']['password'],
+            database=creds['eschol-db']['database'],
             cursorclass=cursor_class)

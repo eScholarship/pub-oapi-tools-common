@@ -19,7 +19,7 @@ def log(level: str,
         message: str):
     """
     Prints messages standard machine-readable format:
-    [timestamp] [level] [module] [message]
+    [timestamp] [level] [module] message
     "ERROR" or "FATAL" levels will raise() instead of print().
 
     :param level: Use the following standard-issue levels for readability, INFO, DEBUG, TRACE, WARN, ERROR, FATAL.

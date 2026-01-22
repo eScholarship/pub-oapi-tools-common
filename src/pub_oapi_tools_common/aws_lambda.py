@@ -65,7 +65,7 @@ def validate_parameters_response(raw_response, verbose):
     """
 
     if verbose:
-        log("DEBUG", __name__, f"raw response:\n{raw_response}")
+        log("DEBUG", __name__, f"Raw response:\n{raw_response}")
 
     # Check metadata HTTP status code
     metadata = raw_response['ResponseMetadata']

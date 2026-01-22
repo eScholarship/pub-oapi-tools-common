@@ -6,8 +6,8 @@ Please note that additional work is required from Symplectic
 to allow this connection to occur (e.g. allow-listing IP CIDRs).
 """
 
-import pyodbc
 from pub_oapi_tools_common.misc import log
+import pyodbc
 
 
 def get_connection(creds: dict = None,
