@@ -4,7 +4,7 @@ import json
 
 
 def get_parameters(param_req: dict,
-                   verbose: bool = True,
+                   verbose: bool = False,
                    quiet: bool = False) -> dict:
     """
     Connects to AWS lambda to retrieve the specified params.
@@ -36,7 +36,7 @@ def get_parameters(param_req: dict,
 
     :param param_req: See above for expected dict format.
     :param verbose: Prints extra debug info.
-    :param quiet: Suppresses non-error logging output
+    :param quiet: Suppresses non-error logging output.
     :return: A dict formatted like
         {name_of_thing_1: [{name_A: val_A, name_B: val_B}], ...}
     """
@@ -80,17 +80,24 @@ def validate_parameters_response(raw_response, verbose, quiet):
         log("ERROR", __name__,
             f"HTTP response from Lambda returned non-200:\n{metadata}")
 
-    # Convert full response JSON string to dict
-    response_payload = json.loads(raw_response['Payload'].read())
-    if response_payload['statusCode'] < 199 or response_payload['statusCode'] > 299:
+    # Convert response payload JSON to dict
+    params_response = json.loads(raw_response['Payload'].read())
+    if verbose and not quiet:
+        log("DEBUG", __name__,
+            f"Params response payload: {params_response}")
+
+    # Check for error message or non-2XX app response
+    if 'errorMessage' in params_response.keys():
+        log("ERROR", __name__, params_response['errorMessage'])
+    elif params_response['statusCode'] < 199 or params_response['statusCode'] > 299:
         log("ERROR", __name__,
-            f"Lambda function returned a non-2XX response:\n{response_payload}")
+            f"Lambda function returned a non-2XX response:\n{params_response}")
 
     # Convert parameters sub-response JSON string to dict
-    params_response = json.loads(response_payload['response'])
-
-    if verbose and not quiet:
-        log("DEBUG", __name__, f"params response:\n{params_response}")
+    # params_response = json.loads(response_payload['response'])
+    #
+    # if verbose and not quiet:
+    #     log("DEBUG", __name__, f"params response:\n{params_response}")
 
     if not params_response or params_response == []:
         log("ERROR", __name__,

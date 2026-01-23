@@ -24,7 +24,7 @@ def put_logs(log_group: str,
              log_stream: str,
              log_events: list,
              logs_client: boto3.session.Session().client = None,
-             verbose: bool = True,
+             verbose: bool = False,
              quiet: bool = False):
     """
     Adds log events to a CloudWatch log stream.
