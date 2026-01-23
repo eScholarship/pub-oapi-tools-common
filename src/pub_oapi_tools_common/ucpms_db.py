@@ -36,32 +36,23 @@ def get_connection(creds: dict = None,
             ("Must provide either 'creds', or 'env'. "
              "Otherwise, we don't know what you want to connect to."))
 
-    # User has supplied creds from parameter store
-    if creds:
-        mssql_conn = pyodbc.connect(
-            driver=creds['driver'],
-            server=(creds['server'] + ',1433'),
-            database=creds['database'],
-            uid=creds['user'],
-            pwd=creds['password'],
-            trustservercertificate='yes')
-
-    # User supplied env and db name. Connect to lambda for creds
-    else:
+    # If user supplies only the env, get the creds from Lambda.
+    if not creds:
         from pub_oapi_tools_common import aws_lambda
-        creds = {
+        param_req = {
             'elements_db': {
                 'folder': 'pub-oapi-tools/elements-reporting-db',
                 'env': env}}
-        creds = aws_lambda.get_parameters(creds)['elements_db']
+        creds = aws_lambda.get_parameters(param_req=param_req)
+        creds = creds['elements_db']
 
-        mssql_conn = pyodbc.connect(
-            driver=creds['driver'],
-            server=(creds['server'] + ',1433'),
-            database=creds['database'],
-            uid=creds['user'],
-            pwd=creds['password'],
-            trustservercertificate='yes')
+    mssql_conn = pyodbc.connect(
+        driver=creds['driver'],
+        server=(creds['server'] + ',1433'),
+        database=creds['database'],
+        uid=creds['user'],
+        pwd=creds['password'],
+        trustservercertificate='yes')
 
     # Required when queries use TRANSACTION
     mssql_conn.autocommit = autocommit

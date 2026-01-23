@@ -12,6 +12,7 @@ def get_logs_client(quiet: bool = False
 
     if not quiet:
         log("INFO", __name__, "Retrieving the cloudwatch logs client from AWS.")
+
     session = boto3.session.Session()
     logs_client = session.client(service_name='logs',
                                  region_name='us-west-2')
@@ -49,5 +50,5 @@ def put_logs(log_group: str,
         logStreamName=log_stream,
         logEvents=log_events)
 
-    if verbose:
+    if verbose and not quiet:
         log("DEBUG", __name__, response)

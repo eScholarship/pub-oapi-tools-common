@@ -59,22 +59,22 @@ def get_connection(creds: dict = None,
 
     # Using the env and database name,
     else:
-        from pub_oapi_tools_common.aws_lambda import get_parameters
-        creds = {
+        from pub_oapi_tools_common import aws_lambda
+        param_req = {
             'tools-rds': {
                 'folder': 'pub-oapi-tools/tools-rds',
                 'env': env,
                 'names': ['server', 'user', 'password']},
-            'database': {
+            'tools-database': {
                 'folder': 'pub-oapi-tools/tools-rds',
                 'env': env,
                 'names': [database]}
         }
-        creds = get_parameters(creds)
+        creds = aws_lambda.get_parameters(param_req=param_req)
 
         return pymysql.connect(
             host=creds['tools-rds']['server'],
             user=creds['tools-rds']['user'],
             password=creds['tools-rds']['password'],
-            database=creds['database'][database],
+            database=creds['tools-database'][database],
             cursorclass=cursor_class)

@@ -44,3 +44,24 @@ def log(level: str,
               f"[{level_color}{level}{Colors.RESET}] "
               f"[{Colors.MAGENTA}{module}{Colors.RESET}] "
               f"{message}")
+
+
+def output_dict_list_to_csv(dict_list: list,
+                            output_file_path: str):
+    """
+    Outputs a list of dicts to CSV.
+    Typically used for saving results of SQL queries.
+
+    :param dict_list: A list of python dicts
+    :param output_file_path: The destination file (path and name).
+        If no path is provided, the file outputs to the current working dir.
+    :return:
+    """
+
+    import csv
+
+    with open(output_file_path, 'w') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(dict_list[0].keys())  # CSV header
+        for row in dict_list:
+            csv_writer.writerow(row.values())

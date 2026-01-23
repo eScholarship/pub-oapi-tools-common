@@ -69,7 +69,7 @@ def get_connection(creds: dict = None,
                 'env': env}}
 
         creds = aws_lambda.get_parameters(
-            input_payload=param_req,
+            param_req=param_req,
             quiet=quiet)
 
         return pymysql.connect(

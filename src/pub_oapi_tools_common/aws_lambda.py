@@ -3,7 +3,7 @@ import boto3
 import json
 
 
-def get_parameters(input_payload: dict,
+def get_parameters(param_req: dict,
                    verbose: bool = True,
                    quiet: bool = False) -> dict:
     """
@@ -12,28 +12,33 @@ def get_parameters(input_payload: dict,
 
     {
         "name_of_thing_1": {
-            "Folder": "path-to-thing-1",
-            "env": "qa"
+            "Folder": "path-to-thing-2",
         },
         "name_of_thing_2": {
-            "Folder": "path-to-thing-2",
+            "Folder": "path-to-thing-1",
+            "env": "qa"
         },
         "name_of_thing_3": {
             "Folder": "path-to-thing-3",
             "env": "prod"
             "names": ['name_1', 'name_2']
         },
+        "name_of_thing_4": {
+            "paths": ['/full/path/name_1', '/full/path/name_2']
+        }
     }
 
-    - The first retrieves all params in the path: path-to-thing-1/qa/*
-    - The second retrieves all params in the path: path-to-think-2/*
+    - The first retrieves all params in the path: path-to-think-1/*
+    - The second retrieves all params in the path: path-to-thing-2/qa/*
     - The third retrieves only params listed in 'names' in: path-to-thing-3/prod
-    (The third pattern can also be used without an 'env'.)
+    - (The third pattern can be used with or without an 'env'.)
+    - The fourth retrieves params from the provided paths
 
-    :param input_payload: See above for expected dict format.
+    :param param_req: See above for expected dict format.
     :param verbose: Prints extra debug info.
     :param quiet: Suppresses non-error logging output
-    :return: A dict formatted like {name_of_thing_1: [{name_A: val_A, name_B: val_B}], ...}
+    :return: A dict formatted like
+        {name_of_thing_1: [{name_A: val_A, name_B: val_B}], ...}
     """
 
     if not quiet:
@@ -45,18 +50,18 @@ def get_parameters(input_payload: dict,
     function_name = 'pub-oapi-tools-parameter-interface'
 
     try:
-        if verbose:
-            log("DEBUG", __name__, f"input payload:\n{input_payload}")
+        if verbose and not quiet:
+            log("DEBUG", __name__, f"input payload:\n{param_req}")
 
         response = lambda_client.invoke(
             FunctionName=function_name,
             InvocationType='RequestResponse',
-            Payload=json.dumps(input_payload))
-
-        params = validate_parameters_response(response, verbose, quiet)
+            Payload=json.dumps(param_req))
 
     except Exception as e:
         raise f"Error invoking Lambda function: {e}"
+
+    params = validate_parameters_response(response, verbose, quiet)
 
     return params
 
@@ -64,7 +69,6 @@ def get_parameters(input_payload: dict,
 def validate_parameters_response(raw_response, verbose, quiet):
     """
     Ensures 200 responses and checks for common problems.
-    Called from get_parameters() above.
     """
 
     if verbose and not quiet:
