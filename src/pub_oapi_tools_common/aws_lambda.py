@@ -4,7 +4,8 @@ import json
 
 
 def get_parameters(input_payload: dict,
-                   verbose: bool = True) -> dict:
+                   verbose: bool = True,
+                   quiet: bool = False) -> dict:
     """
     Connects to AWS lambda to retrieve the specified params.
     It expects python dict input in the following formats
@@ -31,10 +32,12 @@ def get_parameters(input_payload: dict,
 
     :param input_payload: See above for expected dict format.
     :param verbose: Prints extra debug info.
+    :param quiet: Suppresses non-error logging output
     :return: A dict formatted like {name_of_thing_1: [{name_A: val_A, name_B: val_B}], ...}
     """
 
-    log("INFO", __name__, "Retrieving parameters from AWS.")
+    if not quiet:
+        log("INFO", __name__, "Retrieving parameters from AWS.")
 
     # Session and client setup
     session = boto3.session.Session()
@@ -50,7 +53,7 @@ def get_parameters(input_payload: dict,
             InvocationType='RequestResponse',
             Payload=json.dumps(input_payload))
 
-        params = validate_parameters_response(response, verbose)
+        params = validate_parameters_response(response, verbose, quiet)
 
     except Exception as e:
         raise f"Error invoking Lambda function: {e}"
@@ -58,19 +61,18 @@ def get_parameters(input_payload: dict,
     return params
 
 
-def validate_parameters_response(raw_response, verbose):
+def validate_parameters_response(raw_response, verbose, quiet):
     """
     Ensures 200 responses and checks for common problems.
     Called from get_parameters() above.
     """
 
-    if verbose:
+    if verbose and not quiet:
         log("DEBUG", __name__, f"Raw response:\n{raw_response}")
 
     # Check metadata HTTP status code
     metadata = raw_response['ResponseMetadata']
     if metadata['HTTPStatusCode'] != 200:
-
         log("ERROR", __name__,
             f"HTTP response from Lambda returned non-200:\n{metadata}")
 
@@ -83,7 +85,7 @@ def validate_parameters_response(raw_response, verbose):
     # Convert parameters sub-response JSON string to dict
     params_response = json.loads(response_payload['response'])
 
-    if verbose:
+    if verbose and not quiet:
         log("DEBUG", __name__, f"params response:\n{params_response}")
 
     if not params_response or params_response == []:
@@ -93,7 +95,7 @@ def validate_parameters_response(raw_response, verbose):
              "Check your input folder/env against Parameter Store for typos."))
 
     for key, value in params_response.items():
-        if verbose:
+        if verbose and not quiet:
             log("DEBUG", __name__, f"{key} : {value}")
 
         if not value or value == []:

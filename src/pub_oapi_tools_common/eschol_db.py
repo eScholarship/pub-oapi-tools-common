@@ -9,7 +9,8 @@ from pub_oapi_tools_common.misc import log
 def get_connection(creds: dict = None,
                    env: str = None,
                    database: str = None,
-                   cursor_class: str = "DictCursor"
+                   cursor_class: str = "DictCursor",
+                   quiet: bool = False
                    ) -> pymysql.connections.Connection:
     """
     Connects to the eScholarship MySQL database.
@@ -24,13 +25,15 @@ def get_connection(creds: dict = None,
     :param cursor_class: (String) name of a PyMySQL cursor class:
         Cursor, DictCursor (default), SSCursor, or SSDictCursor. See here
         https://pymysql.readthedocs.io/en/latest/modules/cursors.html#
+    :param quiet: Suppresses non-error logging output
     :return: An open PyMySQL connection.
     """
 
-    log("INFO", __name__,
-        (f"Connecting to eScholarship database. "
-         f"This module uses the package pymysql: "
-         f"https://pymysql.readthedocs.io/en/latest/"))
+    if not quiet:
+        log("INFO", __name__,
+            (f"Connecting to eScholarship database. "
+             f"This module uses the package pymysql: "
+             f"https://pymysql.readthedocs.io/en/latest/"))
 
     if not (creds or (env and database)):
         raise ValueError("Must provide either 'creds', or 'env' and 'database'. "
@@ -58,14 +61,16 @@ def get_connection(creds: dict = None,
 
     # Using the env and database name,
     else:
-        from pub_oapi_tools_common.aws_lambda import get_parameters
+        from pub_oapi_tools_common import aws_lambda
 
-        creds = {
+        param_req = {
             'eschol-db': {
                 'folder': 'pub-oapi-tools/eschol-db',
                 'env': env}}
 
-        creds = get_parameters(creds)
+        creds = aws_lambda.get_parameters(
+            input_payload=param_req,
+            quiet=quiet)
 
         return pymysql.connect(
             host=creds['eschol-db']['server'],

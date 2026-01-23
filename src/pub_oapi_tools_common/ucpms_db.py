@@ -12,7 +12,8 @@ import pyodbc
 
 def get_connection(creds: dict = None,
                    env: str = None,
-                   autocommit: bool = True) -> pyodbc.Connection:
+                   autocommit: bool = True,
+                   quiet: bool = False) -> pyodbc.Connection:
     """
     Connects to the Elements reporting DB. Requires either a creds JSON
     or an env variable (prod or qa). Uses the pyodbc package.
@@ -21,12 +22,14 @@ def get_connection(creds: dict = None,
         driver, server, database, user, and password.
     :param env: "prod" or "qa".
     :param autocommit: "True" required for queries that use transactions.
+    :param quiet: Suppresses non-error logging output
     :return: An open pyodbc connection
     """
 
-    log("INFO", __name__,
-        (f"Connecting to the Elements reporting DB. "
-         f"This module uses the package pyodbc: https://pypi.org/project/pyodbc/"))
+    if not quiet:
+        log("INFO", __name__,
+            (f"Connecting to the Elements reporting DB. "
+             f"This module uses the package pyodbc: https://pypi.org/project/pyodbc/"))
 
     if not (creds or env):
         log("ERROR", __name__,
