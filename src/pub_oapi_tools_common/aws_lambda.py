@@ -61,42 +61,42 @@ def get_parameters(param_req: dict,
     except Exception as e:
         raise f"Error invoking Lambda function: {e}"
 
-    params = validate_parameters_response(response, verbose, quiet)
+    params = validate_response(response, verbose, quiet)
 
     return params
 
 
-def validate_parameters_response(raw_response, verbose, quiet):
+def validate_response(http_response, verbose, quiet):
     """
-    Ensures 200 responses and checks for common problems.
+    Ensures 2XX responses and checks for common problems.
     """
 
     if verbose and not quiet:
-        log("DEBUG", __name__, f"Raw response:\n{raw_response}")
+        log("DEBUG", __name__, f"Raw response:\n{http_response}")
 
     # Check metadata HTTP status code
-    metadata = raw_response['ResponseMetadata']
-    if not (199 < metadata['HTTPStatusCode'] < 299):
+    http_metadata = http_response['ResponseMetadata']
+    if not (199 < http_metadata['HTTPStatusCode'] < 299):
         log("ERROR", __name__,
-            f"HTTP response from Lambda returned non-200:\n{metadata}")
+            f"Non-2XX HTTP response:\n{http_metadata}")
 
     # Convert response payload JSON to dict
-    response_payload = json.loads(raw_response['Payload'].read())
+    lambda_payload = json.loads(http_response['Payload'].read())
     if verbose and not quiet:
         log("DEBUG", __name__,
-            f"Params response payload: {response_payload}")
+            f"Params response payload: {lambda_payload}")
+
+    # Check for error message or non-2XX from the lambda function
+    if 'errorMessage' in lambda_payload.keys():
+        log("ERROR", __name__, lambda_payload['errorMessage'])
+    elif not (199 < lambda_payload['statusCode'] < 299):
+        log("ERROR", __name__,
+            f"Lambda function returned a non-2XX response:\n{lambda_payload}")
 
     # Convert parameters sub-response JSON string to dict
-    params_response = json.loads(response_payload['response'])
+    params_response = lambda_payload['response']
     if verbose and not quiet:
         log("DEBUG", __name__, f"params response:\n{params_response}")
-
-    # Check for error message or non-2XX app response
-    if 'errorMessage' in params_response.keys():
-        log("ERROR", __name__, params_response['errorMessage'])
-    elif not (199 < params_response['statusCode'] < 299):
-        log("ERROR", __name__,
-            f"Lambda function returned a non-2XX response:\n{params_response}")
 
     if not params_response or params_response == []:
         log("ERROR", __name__,
