@@ -57,9 +57,10 @@ def get_connection(creds: dict = None,
             database=creds['database'],
             cursorclass=cursor_class)
 
-    # Using the env and database name,
+    # Using the env and/or database name,
     else:
         from pub_oapi_tools_common import aws_lambda
+
         param_req = {
             'tools-rds': {
                 'folder': 'pub-oapi-tools/tools-rds',

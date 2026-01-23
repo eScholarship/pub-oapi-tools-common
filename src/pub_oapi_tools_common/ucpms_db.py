@@ -16,8 +16,9 @@ def get_connection(creds: dict = None,
                    quiet: bool = False,
                    verbose: bool = False) -> pyodbc.Connection:
     """
-    Connects to the Elements reporting DB. Requires either a creds JSON
-    or an env variable (prod or qa). Uses the pyodbc package.
+    Connects to the Elements reporting DB.
+    Requires either a creds dict or an env (prod or qa).
+    Uses the pyodbc package.
 
     :param creds: A dict containing keys/values for:
         driver, server, database, user, and password.
@@ -56,7 +57,7 @@ def get_connection(creds: dict = None,
         pwd=creds['password'],
         trustservercertificate='yes')
 
-    # Required when queries use TRANSACTION
+    # Required to be True if queries use TRANSACTION
     mssql_conn.autocommit = autocommit
 
     return mssql_conn

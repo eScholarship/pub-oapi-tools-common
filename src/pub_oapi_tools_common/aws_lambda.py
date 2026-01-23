@@ -8,7 +8,8 @@ def get_parameters(param_req: dict,
                    quiet: bool = False) -> dict:
     """
     Connects to AWS lambda to retrieve the specified params.
-    It expects python dict input in the following formats
+    It expects python dict input in one of the following formats
+    (you can mix-and-match in your input):
 
     {
         "name_of_thing_1": {
