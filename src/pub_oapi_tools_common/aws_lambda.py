@@ -76,28 +76,27 @@ def validate_parameters_response(raw_response, verbose, quiet):
 
     # Check metadata HTTP status code
     metadata = raw_response['ResponseMetadata']
-    if metadata['HTTPStatusCode'] != 200:
+    if not (199 < metadata['HTTPStatusCode'] < 299):
         log("ERROR", __name__,
             f"HTTP response from Lambda returned non-200:\n{metadata}")
 
     # Convert response payload JSON to dict
-    params_response = json.loads(raw_response['Payload'].read())
+    response_payload = json.loads(raw_response['Payload'].read())
     if verbose and not quiet:
         log("DEBUG", __name__,
-            f"Params response payload: {params_response}")
+            f"Params response payload: {response_payload}")
+
+    # Convert parameters sub-response JSON string to dict
+    params_response = json.loads(response_payload['response'])
+    if verbose and not quiet:
+        log("DEBUG", __name__, f"params response:\n{params_response}")
 
     # Check for error message or non-2XX app response
     if 'errorMessage' in params_response.keys():
         log("ERROR", __name__, params_response['errorMessage'])
-    elif params_response['statusCode'] < 199 or params_response['statusCode'] > 299:
+    elif not (199 < params_response['statusCode'] < 299):
         log("ERROR", __name__,
             f"Lambda function returned a non-2XX response:\n{params_response}")
-
-    # Convert parameters sub-response JSON string to dict
-    # params_response = json.loads(response_payload['response'])
-    #
-    # if verbose and not quiet:
-    #     log("DEBUG", __name__, f"params response:\n{params_response}")
 
     if not params_response or params_response == []:
         log("ERROR", __name__,
