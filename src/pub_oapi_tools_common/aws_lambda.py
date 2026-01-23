@@ -94,7 +94,7 @@ def validate_response(http_response, verbose, quiet):
             f"Lambda function returned a non-2XX response:\n{lambda_payload}")
 
     # Convert parameters sub-response JSON string to dict
-    params_response = lambda_payload['response']
+    params_response = json.loads(lambda_payload['response'])
     if verbose and not quiet:
         log("DEBUG", __name__, f"params response:\n{params_response}")
 
