@@ -65,3 +65,30 @@ def output_dict_list_to_csv(dict_list: list,
         csv_writer.writerow(dict_list[0].keys())  # CSV header
         for row in dict_list:
             csv_writer.writerow(row.values())
+
+
+def validate_creds(creds: dict,
+                   validation_keys=list,
+                   check_values=True) -> bool:
+    """
+    Checks to make sure certain keys are present in a creds dict,
+    and unless otherwise specified, that values for these keys
+    are present.
+
+    :param creds: A dict with key/value pairs
+    :param validation_keys: A list of keys to check for.
+    :param check_values: Ensure values for validation keys are present.
+    :return: Returns True if creds are valid, otherwise, will
+        exit with an error indicating the problem.
+    """
+
+    for v_k in validation_keys:
+        if v_k not in creds.keys():
+            log("ERROR", __name__,
+                f"Your creds file is missing a required key: {validation_keys}")
+        if check_values and (creds[v_k] is None or creds[v_k] == ""):
+            log("ERROR", __name__,
+                f"Your creds dict contains an empty value for the key: {validation_keys}. "
+                f"(To skip value checks during validation, run with check_values=False).")
+
+    return True

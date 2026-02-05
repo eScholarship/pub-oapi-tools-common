@@ -47,6 +47,7 @@ def get_parameters(param_req: dict,
 
     # Session and client setup
     session = boto3.session.Session()
+
     lambda_client = session.client('lambda', region_name='us-west-2')
     function_name = 'pub-oapi-tools-parameter-interface'
 
