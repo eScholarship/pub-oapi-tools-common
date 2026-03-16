@@ -1,5 +1,5 @@
 """
-Functions for working with the pub-oapi-tools MySQL DB
+Functions for working with the Janeway MySQL DB
 """
 
 from pub_oapi_tools_common.misc import log
@@ -12,7 +12,7 @@ def get_connection(creds: dict = None,
                    cursor_class: str = "DictCursor"
                    ) -> pymysql.connections.Connection:
     """
-    Connects to the pub-oapi-tools RDS.
+    Connects to the Janeway DB.
 
     Usage:
         get_connection(creds) -- see aws_lambda.py for expected dict input format
@@ -28,13 +28,13 @@ def get_connection(creds: dict = None,
     """
 
     log("INFO", __name__,
-        (f"Connecting to pub-oapi-tools RDS. "
+        (f"Connecting to Janeway database. "
          f"This module uses the package pymysql: "
          f"https://pymysql.readthedocs.io/en/latest/"))
 
-    if not (creds or (env and database)):
+    if not (creds or env):
         log("ERROR", __name__,
-            ("Must provide either 'creds', or 'env' and 'database'. "
+            ("Must provide either 'creds', or 'env'. "
              "Otherwise, we don't know what you want to connect to."))
 
     # We typically use DictCursor, but other classes are available.
@@ -51,7 +51,7 @@ def get_connection(creds: dict = None,
     # User has supplied creds from parameter store
     if creds:
         return pymysql.connect(
-            host=creds['server'],
+            host=creds['host'],
             user=creds['user'],
             password=creds['password'],
             database=creds['database'],
@@ -62,20 +62,14 @@ def get_connection(creds: dict = None,
         from pub_oapi_tools_common import aws_lambda
 
         param_req = {
-            'tools-rds': {
-                'folder': 'pub-oapi-tools/tools-rds',
-                'env': env,
-                'names': ['server', 'user', 'password']},
-            'tools-database': {
-                'folder': 'pub-oapi-tools/tools-rds',
-                'env': env,
-                'names': [database]}
-        }
+            'janeway-db': {
+                'folder': 'pub-oapi-tools/janeway-db',
+                'env': env}}
         creds = aws_lambda.get_parameters(param_req=param_req)
 
         return pymysql.connect(
-            host=creds['tools-rds']['server'],
-            user=creds['tools-rds']['user'],
-            password=creds['tools-rds']['password'],
-            database=creds['tools-database'][database],
+            host=creds['janeway-db']['host'],
+            user=creds['janeway-db']['user'],
+            password=creds['janeway-db']['password'],
+            database=creds['janeway-db']['database'],
             cursorclass=cursor_class)

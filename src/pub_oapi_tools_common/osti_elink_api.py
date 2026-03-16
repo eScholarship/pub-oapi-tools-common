@@ -72,7 +72,7 @@ class ElinkApi:
                 "Must supply either pub or submission dict.")
         else:
             submission = submission_dict if submission_dict \
-                else submission = pub['submission_json']
+                else pub['submission_json']
 
         req_url = f"{self.creds['endpoint']}/records/submit"
         headers = self.get_auth_header()

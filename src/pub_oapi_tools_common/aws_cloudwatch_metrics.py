@@ -1,6 +1,5 @@
 from pub_oapi_tools_common.misc import log
 import boto3
-from datetime import datetime
 
 
 def get_logs_client(quiet: bool = False,

@@ -1,5 +1,7 @@
 """
-Functions for working with the eScholarship MySQL DB
+Functions for working with the eScholarship analytics
+MySQL DB. Note that the host of this DB will change
+every time a new analytics replica is spun up.
 """
 
 import pymysql
@@ -13,7 +15,7 @@ def get_connection(creds: dict = None,
                    quiet: bool = False
                    ) -> pymysql.connections.Connection:
     """
-    Connects to the eScholarship MySQL database.
+    Connects to an analytics copy of the eScholarship MySQL db.
 
     Usage:
         get_connection(creds) -- see aws_lambda.py for expected dict input format
@@ -31,13 +33,9 @@ def get_connection(creds: dict = None,
 
     if not quiet:
         log("INFO", __name__,
-            (f"Connecting to eScholarship database. "
+            (f"Connecting to ephemeral eScholarship analytics database. "
              f"This module uses the package pymysql: "
              f"https://pymysql.readthedocs.io/en/latest/"))
-
-    if not (creds or (env and database)):
-        raise ValueError("Must provide either 'creds', or 'env' and 'database'. "
-                         "Otherwise, we don't know what you want to connect to.")
 
     # We typically use DictCursor, but other classes are available.
     # https://pymysql.readthedocs.io/en/latest/modules/cursors.html#
@@ -64,40 +62,16 @@ def get_connection(creds: dict = None,
         from pub_oapi_tools_common import aws_lambda
 
         param_req = {
-            'eschol-db': {
-                'folder': 'pub-oapi-tools/eschol-db',
-                'env': env}}
+            'eschol-analytics': {
+                'folder': 'pub-oapi-tools/eschol-analytics'}}
 
         creds = aws_lambda.get_parameters(
             param_req=param_req,
             quiet=quiet)
 
         return pymysql.connect(
-            host=creds['eschol-db']['server'],
-            user=creds['eschol-db']['user'],
-            password=creds['eschol-db']['password'],
-            database=creds['eschol-db']['database'],
+            host=creds['eschol-analytics']['server'],
+            user=creds['eschol-analytics']['user'],
+            password=creds['eschol-analytics']['password'],
+            database=creds['eschol-analytics']['database'],
             cursorclass=cursor_class)
-
-
-def quick_query(env: str, query: str):
-    """
-    Send a single query to the eSchol DB and returns a list of dicts.
-
-    :param env: prod, qa, or dev.
-    :param query: A string of the SQL query to send
-    :return: A list of dicts of the query results
-    """
-    if not (env == 'prod' or env == 'qa' or env == 'dev'):
-        log("ERROR", __name__, "Env value not prod or QA.")
-
-    database = 'eschol' if env == 'prod' else 'eschol-test'
-
-    conn = get_connection(env=env, database=database)
-
-    with conn.cursor() as cursor:
-        cursor.execute(query)
-        results = cursor.fetchall()
-    conn.close()
-
-    return results
