@@ -1,5 +1,6 @@
 from pub_oapi_tools_common.misc import log
 from pub_oapi_tools_common.misc import validate_creds
+from pub_oapi_tools_common.misc import requests_error_handling
 
 from urllib.parse import quote
 from pprint import pprint
@@ -47,13 +48,21 @@ class RorApi:
         """
         return {'Client-Id': self.creds['client-id']}
 
+    @requests_error_handling
+    def requests_get(self, req_url, params, headers):
+        response = requests.get(req_url,
+                                params=params,
+                                headers=headers)
+        return response
+
     def test_req(self):
         headers = self.get_auth_header()
         req_url = f"{self.creds['endpoint']}/organizations"
         params = {'query': 'oxford'}
 
-        response = requests.get(
-            req_url, params=params, headers=headers)
+        response = self.requests_get(req_url,
+                                     params=params,
+                                     headers=headers)
 
         log("INFO", __name__, f"Req status code: {response.status_code}")
         log("INFO", __name__, f"Req body JSON: {response.json()}")
@@ -82,8 +91,9 @@ class RorApi:
         params = {'affiliation': quote(affiliation_string),
                   'single_search': None}
 
-        response = requests.get(
-            req_url, params=params, headers=headers)
+        response = self.requests_get(req_url,
+                                     params=params,
+                                     headers=headers)
 
         if 200 <= response.status_code <= 299:
             log("INFO", __name__, f"Req status code: {response.status_code}")

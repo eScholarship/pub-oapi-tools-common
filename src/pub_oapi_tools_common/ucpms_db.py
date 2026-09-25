@@ -10,6 +10,7 @@ from pub_oapi_tools_common.misc import log
 import pyodbc
 
 
+
 def get_connection(creds: dict = None,
                    env: str = None,
                    autocommit: bool = True,
@@ -50,11 +51,13 @@ def get_connection(creds: dict = None,
         creds = creds['elements_db']
 
     mssql_conn = pyodbc.connect(
-        driver=creds['driver'],
+        # driver=creds['driver'],
+        driver='ODBC Driver 17 for SQL Server',
         server=(creds['server'] + ',1433'),
         database=creds['database'],
         uid=creds['user'],
         pwd=creds['password'],
+        encrypt='yes',
         trustservercertificate='yes')
 
     # Required to be True if queries use TRANSACTION

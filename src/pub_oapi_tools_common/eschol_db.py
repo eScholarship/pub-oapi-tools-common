@@ -20,7 +20,7 @@ def get_connection(creds: dict = None,
         or get_connection(env, database)
 
     :param creds: A dict containing driver, server, database, user, and password key/values.
-    :param env: Presently, "prod" is the only env here.
+    :param env: "prod" or "staging"
     :param database: Name of the DB to connect to.
     :param cursor_class: (String) name of a PyMySQL cursor class:
         Cursor, DictCursor (default), SSCursor, or SSDictCursor. See here
