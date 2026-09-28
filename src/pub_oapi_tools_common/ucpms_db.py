@@ -10,7 +10,6 @@ from pub_oapi_tools_common.misc import log
 import pyodbc
 
 
-
 def get_connection(creds: dict = None,
                    env: str = None,
                    autocommit: bool = True,

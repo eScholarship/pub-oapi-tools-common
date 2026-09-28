@@ -46,7 +46,7 @@ def get_parameters(param_req: dict,
         log("INFO", __name__, "Retrieving parameters from AWS.")
 
     # Session and client setup
-    session = boto3.session.Session(profile_name='pad-prd-admin-777968769372')
+    session = boto3.session.Session()
 
     lambda_client = session.client('lambda', region_name='us-west-2')
     function_name = 'pub-oapi-tools-parameter-interface'

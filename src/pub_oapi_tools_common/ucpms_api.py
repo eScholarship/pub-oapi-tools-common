@@ -1,4 +1,6 @@
-from pub_oapi_tools_common.misc import log, validate_creds
+from pub_oapi_tools_common.misc import log
+from pub_oapi_tools_common.misc import validate_creds
+from pub_oapi_tools_common.misc import requests_error_handling
 import xml.etree.ElementTree as ET
 import requests
 
@@ -12,8 +14,8 @@ class UCPMSApi:
 
         if not (creds or env):
             log("ERROR", __name__,
-                ("Must provide either 'creds', or 'env'. "
-                 "Otherwise, we don't know what you want to connect to."))
+                "Must provide either 'creds', or 'env'. "
+                "Otherwise, we don't know what you want to connect to.")
 
         # If creds supplied, validate
         if creds:
@@ -53,34 +55,28 @@ class UCPMSApi:
         """
         http_method = http_method.upper()
 
-        log("INFO", __name__,
-            f"Sending: {http_method} to {self.creds['endpoint']}/{query_path}")
+        req_url = f"{self.creds['endpoint']}/{query_path}"
+        headers = {"Content-Type": "application/xml"} if body_xml else None
 
-        try:
-            if http_method == 'GET':
-                response = self.get(endpoint=self.creds['endpoint'],
-                                    query_path=query_path,
-                                    body_xml=body_xml)
-            elif http_method == 'PUT':
-                response = self.put(endpoint=self.creds['endpoint'],
-                                    query_path=query_path,
-                                    body_xml=body_xml)
-            elif http_method == 'PATCH':
-                response = self.patch(endpoint=self.creds['endpoint'],
-                                      query_path=query_path,
-                                      body_xml=body_xml)
-            else:
-                log("ERROR", __name__,
-                    f"Specified HTTP method {http_method} not supported.")
-        except requests.exceptions.ConnectionError:
+        log("INFO", __name__, f"Sending: {http_method} to {req_url}")
+
+        if http_method == 'GET':
+            response = self.get(req_url=req_url,
+                                headers=headers,
+                                body_xml=body_xml)
+
+        elif http_method == 'PUT':
+            response = self.put(req_url=req_url,
+                                headers=headers,
+                                body_xml=body_xml)
+
+        elif http_method == 'PATCH':
+            response = self.patch(req_url=req_url,
+                                  headers=headers,
+                                  body_xml=body_xml)
+        else:
             log("ERROR", __name__,
-                f"The internet connection was lost or the server is down.")
-        except requests.exceptions.Timeout:
-            log("ERROR", __name__,
-                f"The request timed out.")
-        except requests.exceptions.RequestException as e:
-            log("ERROR", __name__,
-                f"An unexpected error occurred: {e}")
+                f"Specified HTTP method {http_method} not supported.")
 
         if not self.quiet:
             log("INFO", __name__,
@@ -99,31 +95,23 @@ class UCPMSApi:
             root = ET.fromstring(xml_string)
             return root
 
+    @requests_error_handling
     def get(self,
-            endpoint: str,
-            query_path: str,
+            req_url: str,
+            headers: dict = None,
             body_xml: str = None) -> requests.Response:
-
-        req_url = f"{endpoint}/{query_path}"
-        headers = {"Content-Type": "application/xml"} \
-            if body_xml else None
 
         response = requests.get(req_url,
                                 auth=self.auth,
                                 headers=headers,
                                 data=body_xml)
-
         return response
 
+    @requests_error_handling
     def put(self,
-            endpoint: str,
-            query_path: str,
+            req_url: str,
+            headers: dict = None,
             body_xml: str = None) -> requests.Response:
-
-        req_url = f"{endpoint}/{query_path}"
-
-        headers = {"Content-Type": "application/xml"} \
-            if body_xml else None
 
         response = requests.put(req_url,
                                 auth=self.auth,
@@ -131,19 +119,14 @@ class UCPMSApi:
                                 data=body_xml)
         return response
 
+    @requests_error_handling
     def patch(self,
-              endpoint: str,
-              query_path: str,
+              req_url: str,
+              headers: dict = None,
               body_xml: str = None) -> requests.Response:
-
-        req_url = f"{endpoint}/{query_path}"
-        headers = {"Content-Type": "application/xml"} \
-            if body_xml else None
 
         response = requests.patch(req_url,
                                   auth=self.auth,
                                   headers=headers,
-                                  data=body_xml,
-                                  timeout=10)
-
+                                  data=body_xml)
         return response

@@ -116,7 +116,7 @@ def requests_error_handling(func):
         except requests.exceptions.RequestException as err:
             log("ERROR", __name__, f"An unexpected requests error occurred: {err}")
         except Exception as e:
-            log("ERROR", __name__, f"An unexpected non-requests error occured: {e}")
+            log("ERROR", __name__, f"An unexpected non-requests error occurred: {e}")
 
     return wrapper
 
