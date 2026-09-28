@@ -4,6 +4,7 @@ OSTI E-Link 2 documentation https://osti.gov/elink2api/
 """
 from pub_oapi_tools_common.misc import log
 from pub_oapi_tools_common.misc import validate_creds
+from pub_oapi_tools_common.misc import requests_error_handling
 
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -76,16 +77,17 @@ class ElinkApi:
 
         req_url = f"{self.creds['endpoint']}/records/submit"
         headers = self.get_auth_header()
-        response = requests.post(req_url,
-                                 json=submission,
-                                 headers=headers)
+        response = requests_error_handling(requests.post)(req_url,
+                                                          json=submission,
+                                                          headers=headers)
         return response
 
     def put_metadata(self, pub) -> requests.Response:
         req_url = f"{self.creds['endpoint']}/records/{pub['osti_id']}/submit"
         headers = self.get_auth_header()
-        response = requests.put(
-            req_url, json=pub['submission_json'], headers=headers)
+        response = requests_error_handling(requests.put)(req_url,
+                                                         json=pub['submission_json'],
+                                                         headers=headers)
         return response
 
     def post_media(self, pub) -> requests.Response:
@@ -95,8 +97,9 @@ class ElinkApi:
         pdf_filename = pub['File URL'].split('/')[-1]
         pdf_headers = {'user-agent': self.creds['pdf-user-agent']}
 
-        pdf_response = requests.get(
-            pub['File URL'], headers=pdf_headers, stream=True)
+        pdf_response = requests_error_handling(requests.get)(pub['File URL'],
+                                                             headers=pdf_headers,
+                                                             stream=True)
         pdf_response.raw.decode_content = True
 
         mp_encoder = MultipartEncoder(
@@ -107,8 +110,10 @@ class ElinkApi:
         params = {'title': pub['title']}
 
         # Send the post with the PDF data
-        media_response = requests.post(
-            req_url, headers=headers, params=params, data=mp_encoder)
+        media_response = requests_error_handling(requests.post)(req_url,
+                                                                headers=headers,
+                                                                params=params,
+                                                                data=mp_encoder)
 
         return media_response
 
@@ -119,10 +124,9 @@ class ElinkApi:
         pdf_filename = pub['File URL'].split('/')[-1]
         pdf_headers = {'user-agent': self.creds['pdf-user-agent']}
 
-        pdf_response = requests.get(
-            pub['File URL'],
-            headers=pdf_headers,
-            stream=True)
+        pdf_response = requests_error_handling(requests.get)(pub['File URL'],
+                                                             headers=pdf_headers,
+                                                             stream=True)
         pdf_response.raw.decode_content = True
 
         mp_encoder = MultipartEncoder(
@@ -133,8 +137,10 @@ class ElinkApi:
         params = {'title': pub['title']}
 
         # Send the post with the PDF data
-        media_response = requests.put(
-            req_url, headers=headers, params=params, data=mp_encoder)
+        media_response = requests_error_handling(requests.put)(req_url,
+                                                               headers=headers,
+                                                               params=params,
+                                                               data=mp_encoder)
 
         return media_response
 
@@ -150,8 +156,9 @@ class ElinkApi:
             'date_first_submitted_from': '10/01/2024',
             'workflow_status': workflow_status}
 
-        response = requests.get(
-            req_url, params=params, headers=headers)
+        response = requests_error_handling(requests.get)(req_url,
+                                                         params=params,
+                                                         headers=headers)
         return response
 
     def get_hidden_pubs(self) -> requests.Response:
@@ -162,14 +169,15 @@ class ElinkApi:
             'date_first_submitted_from': '10/01/2024',
             'hidden_flag': 'true'}
 
-        response = requests.get(
-            req_url, params=params, headers=headers)
+        response = requests_error_handling(requests.get)(req_url,
+                                                         params=params,
+                                                         headers=headers)
         return response
 
     def get_single_pub(self, osti_id) -> requests.Response:
         req_url = f"{self.creds['endpoint']}/records/{osti_id}"
         headers = self.get_auth_header()
-        response = requests.get(req_url, headers=headers)
+        response = requests_error_handling(requests.get)(req_url, headers=headers)
         return response
 
     # Generic search function
@@ -191,8 +199,9 @@ class ElinkApi:
 
         req_url = f"{self.creds['endpoint']}/records"
         headers = self.get_auth_header()
-        response = requests.get(
-            req_url, params=query_params, headers=headers)
+        response = requests_error_handling(requests.get)(req_url,
+                                                         params=query_params,
+                                                         headers=headers)
         return response
 
     def get_comments(self,
@@ -219,7 +228,7 @@ class ElinkApi:
 
         req_url = f"{self.creds['endpoint']}/comments/{osti_id}"
         headers = self.get_auth_header()
-        response = requests.get(req_url, headers=headers)
+        response = requests_error_handling(requests.get)(req_url, headers=headers)
         if decode_json:
             try:
                 return_json = response.json()

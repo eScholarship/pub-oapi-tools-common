@@ -9,7 +9,7 @@ from pub_oapi_tools_common.misc import log
 
 
 def get_connection(creds: dict = None,
-                   env: str = None,
+                   env: str = 'prod',
                    database: str = None,
                    cursor_class: str = "DictCursor",
                    quiet: bool = False
@@ -75,3 +75,21 @@ def get_connection(creds: dict = None,
             password=creds['eschol-analytics']['password'],
             database=creds['eschol-analytics']['database'],
             cursorclass=cursor_class)
+
+
+def quick_query(query: str):
+    """
+    Send a single query to the eSchol DB and returns a list of dicts.
+
+    :param query: A string of the SQL query to send
+    :return: A list of dicts of the query results
+    """
+
+    conn = get_connection()
+
+    with conn.cursor() as cursor:
+        cursor.execute(query)
+        results = cursor.fetchall()
+    conn.close()
+
+    return results

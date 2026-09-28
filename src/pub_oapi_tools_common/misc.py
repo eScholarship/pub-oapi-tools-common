@@ -92,3 +92,44 @@ def validate_creds(creds: dict,
                 f"(To skip value checks during validation, run with check_values=False).")
 
     return True
+
+
+def requests_error_handling(func):
+    """
+    Decorator for wrapping requests functions like
+    .get(), .put(), and .patch() in error handling
+    :param func: The requests function to wrap
+    :return: Results from the requests function
+    """
+
+    import requests
+
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.HTTPError as http_err:
+            log("ERROR", __name__, f"4xx/5xx response: {http_err}")
+        except requests.exceptions.ConnectionError as conn_err:
+            log("ERROR", __name__, f"Connection error occurred: {conn_err}")
+        except requests.exceptions.Timeout as timeout_err:
+            log("ERROR", __name__, f"Timeout error occurred: {timeout_err}")
+        except requests.exceptions.RequestException as err:
+            log("ERROR", __name__, f"An unexpected requests error occurred: {err}")
+        except Exception as e:
+            log("ERROR", __name__, f"An unexpected non-requests error occurred: {e}")
+
+    return wrapper
+
+
+def chunk_list_to_size_n(list_to_chunk, chunk_size):
+    """
+    Chunk a list into lists of size n.
+    :param list_to_chunk: The original (flat) list
+    :param chunk_size: The size of the sublists
+    :return: A list of lists
+    """
+    def chunks(lst, n):
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
+
+    return list(chunks(list_to_chunk, chunk_size))

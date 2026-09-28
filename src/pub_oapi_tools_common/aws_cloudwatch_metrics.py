@@ -26,9 +26,8 @@ def get_logs_client(quiet: bool = False,
 
 def put_metrics(namespace: str,
                 metrics_data: list,
-                client: boto3.client = get_logs_client(),
-                quiet: bool = False
-                ):
+                quiet: bool = False,
+                client: boto3.client = None):
     """
     Uploads metric data to CloudWatch.
     The metrics_data input must be a list of AWS'
@@ -38,11 +37,13 @@ def put_metrics(namespace: str,
 
     :param namespace: The CW Metrics namespace for the metrics
     :param metrics_data: A list of MetricsDatum (see above)
-    :param client: A boto3 Cloudwatch client.
-        If blank, a new client is gotten.
+    :param client: A boto3 Cloudwatch client. If blank, a new client is created.
     :param quiet: Suppresses non-error logging output.
     :return: A response object
     """
+
+    if not client:
+        client: boto3.client = get_logs_client(quiet=quiet)
 
     response = client.put_metric_data(
         MetricData=metrics_data,
